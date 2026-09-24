@@ -319,6 +319,41 @@ git checkout -- start-gallery.cmd stop-gallery.cmd test-gallery.cmd s.bat build\
 git commit -m "normalize line endings"
 ```
 
+## 掉线(闪断)后的文件复核
+
+这块 USB 硬盘会**静默丢写**:UASPStor 反复重置设备、NTFS 报「无法将数据刷新到事务日志」。一次写入可以返回成功、从页缓存回读也正常,却从未落盘——`.gitattributes` 就是这样消失过一次(当时回读正常,直到提交时才发现文件不在)。因此每次掉线后按下面顺序复核:
+
+```bat
+:: 1) 先定位掉线窗口(存储错误事件的时间分布)
+powershell -NoProfile -Command "Get-WinEvent -FilterHashtable @{LogName='System';StartTime=(Get-Date).AddDays(-1)} | Where-Object { $_.Id -in 129,140,50,98,153 -and $_.ProviderName -match 'UASPStor|Ntfs|disk' } | Group-Object { $_.TimeCreated.ToString('MM-dd HH:00') } | Select Name,Count"
+
+:: 2) 校验窗口内写过的文件(--assets 连缩略图一起查;RIFF 自校验能发现截断)
+node build\verify-files.js --since "2026-09-24 08:55" --until "2026-09-24 12:35" --assets
+
+:: 3) 与基线清单比对:找出消失的或被改动的文件
+node build\verify-files.js --check
+
+:: 4) 资产全量体检(7376 个 WebP;耗时且吃 I/O,盘不稳时先别跑)
+node build\verify-assets.js
+```
+
+`build\file-manifest.json` 是基线清单(源码文件的 SHA-256 + 大小)。**改动代码后重新录制**:`node build\verify-files.js --record`(清单本身不参与哈希,复录后 `--check` 立即干净)。
+
+校验按文件类型区分,针对真实会发生的失效模式:
+
+| 类型 | 检查 |
+|---|---|
+| `.js` | 语法编译(`vm.Script`,不执行) |
+| `.html` | 结尾 `</html>` + 关键元素 `#statsModal`/`#statsBtn`/`#lightbox`/`#grid` |
+| `.css` | 花括号配对 + 结尾换行 |
+| `.json` | `JSON.parse` |
+| `.cmd`/`.bat`/`.ps1` | 必须是 CRLF;`.ps1` 还要求 UTF-8 BOM |
+| `.webp` | RIFF 声明长度与实际一致、VP8 块不越界 |
+| `.jpg`/`.png` | SOI/EOI 与 PNG 签名 |
+| 全部文本 | 无 NUL 字节(零填充特征)、UTF-8 可解 |
+
+> 本次实际复核结果(2026-09-24,窗口 08:55–12:34,343 条存储错误):窗口内写入的是 `index.html`、`styles.css`、`build\diag-stats.js`,以及被 `diag-reload.js` 原样重写的 `assets\thumbs\cana00001.webp`——全部通过结构校验,面板与缩略图另经功能验证(面板 8 行会话数据 + 8 行服务器数据、缩略图 RIFF 长度一致且 sharp 完整解码 640×427)。
+
 ## 目录结构
 
 ```

@@ -1,0 +1,182 @@
+{
+  "generated": "2026-09-24T04:54:37.139Z",
+  "root": "H:\\HDownload\\Flickr-Gallery",
+  "files": {
+    ".gitattributes": {
+      "size": 1222,
+      "sha256": "11222e56e0400be5431dcace6025166cc9483c0dd3ba12f5b4421cbbd7475aee"
+    },
+    ".gitignore": {
+      "size": 2372,
+      "sha256": "fa282f00bbc2c2df9c91eaa102e1a195d0e25e71388756df0d3c7873b7a6a352"
+    },
+    "app.js": {
+      "size": 69050,
+      "sha256": "087651bc6fc2b180bcb1a9051005175fa530b81accddae183ae850325a444468"
+    },
+    "build/build.js": {
+      "size": 14224,
+      "sha256": "6f20fdd364befdfad7830297d650c01628f9bbb3ce20581499ab66d0cbc2f59b"
+    },
+    "build/deploy-check.png": {
+      "size": 442361,
+      "sha256": "9e2ab707fb34b474ad73563dd6a64be52f80341640c0f4c4352e2cf63510d2ac"
+    },
+    "build/diag-close.js": {
+      "size": 2953,
+      "sha256": "4f42e573cce6fc0f54cafdc700a36ddb92f3a7df6d7718a5947d8efd6466085f"
+    },
+    "build/diag-keys.js": {
+      "size": 4646,
+      "sha256": "e0cbcb740626ddad9e85ffb1a4397f1bdffaaf2c42a65d6027c7222b6cf75ac6"
+    },
+    "build/diag-longtask.js": {
+      "size": 3955,
+      "sha256": "2704a0ecb1850e207cb11e82c703adef65cd47f3860a5d49be4c009844028737"
+    },
+    "build/diag-reload.js": {
+      "size": 3466,
+      "sha256": "6bc4d8636e3d90531f585f7fe8a370d3d3d6d55df39ddbcc92cd15f95297e13c"
+    },
+    "build/diag-stats.js": {
+      "size": 3510,
+      "sha256": "32086c88721a230996c5d5225b5d71701ce3fc27d4364e5a5dffe4997f30c5ae"
+    },
+    "build/diag-stripfix.js": {
+      "size": 3639,
+      "sha256": "e87088a80d8bad2eb0fa10d60c7fca446c2e49e4e1cecf8e19eeca509df38e6c"
+    },
+    "build/disk-check.js": {
+      "size": 3671,
+      "sha256": "46ffb5ff8cdab9be8ada353890e962fb1565f8a76ab3ab9fdf1ddb09ce5b04be"
+    },
+    "build/events-test.js": {
+      "size": 42604,
+      "sha256": "4fcfb9c0865bf5c0dffd29a5fb001e9cfc79e9ccece602ce4d8cfc3251fcfffb"
+    },
+    "build/exif.js": {
+      "size": 5521,
+      "sha256": "aaea4f182a29695194ead534bba9798a09d5562fddcf9d36e3812c7ab6264bb8"
+    },
+    "build/failed.json": {
+      "size": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "build/final-check.js": {
+      "size": 1199,
+      "sha256": "0c057165993fa41765ccc7ea454c93cecdf0a6e4ad8779bd114080113aeeed47"
+    },
+    "build/latency.js": {
+      "size": 3774,
+      "sha256": "84c12060dba918343bf748f710ecfec21e2cee67781e62e7c1f7dd63a5eee6be"
+    },
+    "build/launch.js": {
+      "size": 11540,
+      "sha256": "c2886f58bcf411884c46ed2c6e58dfa917f3384c0ad7da685c3b0d05c721c43e"
+    },
+    "build/log-stats.js": {
+      "size": 8707,
+      "sha256": "970a5601f6a252febb8a7da00918f600704440f88187e77650ea89d52fd1fa21"
+    },
+    "build/logger.js": {
+      "size": 5866,
+      "sha256": "e0290a1ad3df275543ce8f687318be83be33d59bdc2f254a6c44a2b8ae4afd9b"
+    },
+    "build/meta-gallery-test-41870f.json": {
+      "size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    "build/meta.json": {
+      "size": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    "build/open-latency.js": {
+      "size": 3035,
+      "sha256": "6acee08305b9db4846c51598e5f3af167d5913a9e7bfb9b7beb62d222c53b58c"
+    },
+    "build/package-lock.json": {
+      "size": 30069,
+      "sha256": "c0d727e3e39b3961d8322eaa6305aeff2890b55b1605242c020b073e56ad5da3"
+    },
+    "build/package.json": {
+      "size": 258,
+      "sha256": "f8b886a3500d31ca45f2ecbea79b9932840ecf29434b094838c5068a5bdac7c4"
+    },
+    "build/perf-probe.js": {
+      "size": 4837,
+      "sha256": "1cf710fae60cefcc0a845ee4288bb07bf19c6d0fcc29c329ed3271301a87eb7b"
+    },
+    "build/server.js": {
+      "size": 14142,
+      "sha256": "fcf59783528d920d435f6381ab2a963e14c0d52de311b86f341462fd494ac586"
+    },
+    "build/smoke.js": {
+      "size": 20336,
+      "sha256": "ef4a9c21ae70f61cd9627323f1bf7c131cbf32558d5755b892dd3cd18f777214"
+    },
+    "build/stop-server.ps1": {
+      "size": 2572,
+      "sha256": "5f8dfa134e9f655e22d82cb2308bbc9b1549d916e5ff508aca443d555e65a264"
+    },
+    "build/telemetry-test.js": {
+      "size": 1590,
+      "sha256": "05fa5b9c0af2c0dcf8d94d083471df9480a4454e3a0cf92bf88dbd5ca394a0b1"
+    },
+    "build/transition-check.js": {
+      "size": 1991,
+      "sha256": "a0e2901fdcf204ceb2584ea5cccdf8369e49815d90b66a9e0dbf49a12e104322"
+    },
+    "build/verify-assets.js": {
+      "size": 1828,
+      "sha256": "30a72bddd6a31b3f289f2c23fb8575ddb81fea16ee5f23a5ffaf4d3379bd46c0"
+    },
+    "build/verify-files.js": {
+      "size": 9193,
+      "sha256": "93d5dc7dbe22de3f37e934a93a68c891b5ee7108cda41338b34ef4ea2e6e9ec6"
+    },
+    "config.js": {
+      "size": 317,
+      "sha256": "92519cbf8ee9df8689efba5d1ac9cc435c76f304a5a467269df78ffe9fd67401"
+    },
+    "data.js": {
+      "size": 2306046,
+      "sha256": "80397ad45022a7926a4798be2688cf7128a4ae54ffaa9f48500c84503fc0bce3"
+    },
+    "folders.json": {
+      "size": 648,
+      "sha256": "92679481a303e59a369f6f46c71691085e8f4d5126493f0de1ae2fa2719dab11"
+    },
+    "index.html": {
+      "size": 15143,
+      "sha256": "8ed39056455fb50b47b0054676ec7459e81f59bd707f5d93bc6dcc48b8f328eb"
+    },
+    "latency-report.md": {
+      "size": 3272,
+      "sha256": "493da43291e176a774f2c30ba9d2975e621046f060b57a20ebce883d1704a2a1"
+    },
+    "README.md": {
+      "size": 25133,
+      "sha256": "73c14de0311fc411037f3228858748c4ecb165bd73d43f4aec2502399846def9"
+    },
+    "s.bat": {
+      "size": 234,
+      "sha256": "6b56795d54cd23b684c99463e486402a8e71686deae640522b81e055ab8586f3"
+    },
+    "start-gallery.cmd": {
+      "size": 1632,
+      "sha256": "278dfe782b37e428daacdfbeb564c0c64f816a51b257c72434d80d4f7ee10030"
+    },
+    "stop-gallery.cmd": {
+      "size": 814,
+      "sha256": "ee11e61c566ea68503c6f4eb18d89d6a2e57101776a2ab7aa9e37425f55f1f0f"
+    },
+    "styles.css": {
+      "size": 21846,
+      "sha256": "d5c65ed3632c54c738e622b821b937b192668e2c9382c377e4700a8efa6b6c67"
+    },
+    "test-gallery.cmd": {
+      "size": 1527,
+      "sha256": "8446a9203943036bf25a12b7350a995c59fb61aefd781e81fc4d9a02963097bb"
+    }
+  }
+}
