@@ -298,6 +298,27 @@ node build\server.js --no-open --no-reload
 
 同类问题(缩放重置时机、预取污染图层)在优化过程中还复现过两次,因此阶段二把它们固化为**回归用例**,而不是修完就算。
 
+## 换行符与版本控制
+
+仓库内所有文本文件一律存为 **LF**,只有 Windows 脚本(`*.cmd` / `*.bat` / `*.ps1`)检出为 **CRLF**——由 `.gitattributes` 强制,与本机 `core.autocrlf` 无关(仓库内已设 `core.autocrlf=false`,让属性文件说了算)。
+图片显式标记为 `binary`,避免任何行尾过滤器碰到它们(**WebP 一旦被转换就会破坏 RIFF 头**)。
+
+```
+* text=auto eol=lf          # 默认:入库 LF,检出 LF
+*.cmd *.bat *.ps1 → eol=crlf # Windows 脚本检出 CRLF
+*.jpg *.png *.webp … → binary
+```
+
+`git add` 报 `warning: LF will be replaced by CRLF` 说明**工作区形式与属性约定不一致**(典型原因:`.gitattributes` 缺失,仅剩全局 `core.autocrlf=true` 生效)。修复方式:
+
+```bat
+git config --local core.autocrlf false
+git add --renormalize .          :: 按属性重写索引
+:: 之后把脚本文件的工作区形式刷成 CRLF(缺这一步,git add 仍会对它们报警告)
+git checkout -- start-gallery.cmd stop-gallery.cmd test-gallery.cmd s.bat build\stop-server.ps1
+git commit -m "normalize line endings"
+```
+
 ## 目录结构
 
 ```
