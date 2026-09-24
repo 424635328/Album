@@ -34,6 +34,10 @@ const LS = {
 const STATS = (() => {
   const map = new Map();
   const MAX_SAMPLES = 400;                 // per key; bounds memory, keeps percentiles sane
+  /* A sample above a minute is a suspend/resume artifact (performance.now() keeps
+     counting while Windows sleeps), not latency — counted, never averaged in. */
+  const MAX_PLAUSIBLE_MS = 60000;
+  let interrupted = 0;
   const keyFor = (event, data) => {
     if (event === 'click' && data && data.target) return 'click:' + data.target;
     if (data && data.cached === true) return event + ' (预取命中)';
@@ -45,7 +49,8 @@ const STATS = (() => {
     if (ms === null || !Number.isFinite(ms) || ms < 0) return;
     const key = keyFor(event, data);
     let s = map.get(key);
-    if (!s) { s = { n: 0, sum: 0, min: Infinity, max: 0, samples: [] }; map.set(key, s); }
+    if (!s) { s = { n: 0, sum: 0, min: Infinity, max: 0, samples: [], interrupted: 0 }; map.set(key, s); }
+    if (ms > MAX_PLAUSIBLE_MS) { s.interrupted++; interrupted++; return; }
     s.n++; s.sum += ms; s.min = Math.min(s.min, ms); s.max = Math.max(s.max, ms);
     s.samples.push(ms);
     if (s.samples.length > MAX_SAMPLES) s.samples.shift();
@@ -54,15 +59,15 @@ const STATS = (() => {
   function rows() {
     return [...map.entries()].map(([key, s]) => {
       const sorted = s.samples.slice().sort((a, b) => a - b);
-      return { key, n: s.n, mean: Math.round(s.sum / s.n), median: pct(sorted, 50), p95: pct(sorted, 95), min: s.min, max: s.max, window: s.samples.length };
+      return { key, n: s.n, mean: Math.round(s.sum / s.n), median: pct(sorted, 50), p95: pct(sorted, 95), min: s.min, max: s.max, window: s.samples.length, interrupted: s.interrupted };
     }).sort((a, b) => b.n - a.n);
   }
   function totals() {
     let n = 0, sum = 0, worst = 0, worstKey = '';
     for (const r of rows()) { n += r.n; sum += r.mean * r.n; if (r.max > worst) { worst = r.max; worstKey = r.key; } }
-    return { n, mean: n ? Math.round(sum / n) : 0, worst, worstKey, keys: map.size };
+    return { n, mean: n ? Math.round(sum / n) : 0, worst, worstKey, keys: map.size, interrupted };
   }
-  return { add, rows, totals, reset() { map.clear(); } };
+  return { add, rows, totals, reset() { map.clear(); interrupted = 0; } };
 })();
 
 const WEBLOG = (() => {
@@ -547,7 +552,8 @@ function makeCard(p, h, idx) {
   img.addEventListener('load', () => {
     fig.classList.add('ld');
     const ms = Math.round(PERF.now() - thumbT0);
-    if (ms > 2000) WEBLOG.send('warn', 'thumb.slow', { k: p.k, ms: ms });
+    // > 60s means the machine slept mid-load, not that the thumbnail is slow
+  if (ms > 2000 && ms < 60000) WEBLOG.send('warn', 'thumb.slow', { k: p.k, ms: ms });
   }, { once: true });
   img.addEventListener('error', () => {
     fig.classList.add('err');
@@ -1386,6 +1392,7 @@ function renderStatsPanel() {
     ['总体均值', t.mean + ' ms'],
     ['事件种类', t.keys],
     ['最慢单次', t.worst + ' ms' + (t.worstKey ? ' · ' + t.worstKey : '')],
+    ...(t.interrupted ? [['中断样本', t.interrupted + ' 次(机器休眠)']] : []),
   ].map(([k, v]) => `<span>${k}<b>${v}</b></span>`).join('');
 
   const body = els.statsTable.tBodies[0];

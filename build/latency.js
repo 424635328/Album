@@ -15,8 +15,12 @@
  * cold read are different phenomena and averaging them together hides both.
  */
 
-const windows = new Map();   // key → { wN, wSum, wMin, wMax, tN, tSum, tMin, tMax }
+const windows = new Map();   // key → { wN, wSum, wMin, wMax, tN, tSum, tMin, tMax, wInt, tInt }
 let dirty = false;
+
+/* Anything above this is a suspend/resume artifact (performance.now() keeps counting
+   while the machine sleeps), not latency. Counted separately, never averaged in. */
+const MAX_PLAUSIBLE_MS = 60000;
 
 function keyOf(event, data) {
   let k = event;
@@ -30,7 +34,8 @@ function observe(event, data) {
   if (ms === null || !Number.isFinite(ms) || ms < 0) return;
   const k = keyOf(String(event || 'event'), data);
   let s = windows.get(k);
-  if (!s) { s = { wN: 0, wSum: 0, wMin: Infinity, wMax: 0, tN: 0, tSum: 0, tMin: Infinity, tMax: 0 }; windows.set(k, s); }
+  if (!s) { s = { wN: 0, wSum: 0, wMin: Infinity, wMax: 0, tN: 0, tSum: 0, tMin: Infinity, tMax: 0, wInt: 0, tInt: 0 }; windows.set(k, s); }
+  if (ms > MAX_PLAUSIBLE_MS) { s.wInt += 1; s.tInt += 1; dirty = true; return; }
   s.wN += 1; s.wSum += ms; s.wMin = Math.min(s.wMin, ms); s.wMax = Math.max(s.wMax, ms);
   s.tN += 1; s.tSum += ms; s.tMin = Math.min(s.tMin, ms); s.tMax = Math.max(s.tMax, ms);
   dirty = true;
@@ -43,8 +48,8 @@ function snapshot() {
   return [...windows.entries()]
     .map(([event, s]) => ({
       event,
-      window: { n: s.wN, mean: mean(s.wSum, s.wN), min: s.wN ? s.wMin : null, max: s.wMax },
-      total: { n: s.tN, mean: mean(s.tSum, s.tN), min: s.tN ? s.tMin : null, max: s.tMax },
+      window: { n: s.wN, mean: mean(s.wSum, s.wN), min: s.wN ? s.wMin : null, max: s.wMax, interrupted: s.wInt },
+      total: { n: s.tN, mean: mean(s.tSum, s.tN), min: s.tN ? s.tMin : null, max: s.tMax, interrupted: s.tInt },
     }))
     .sort((a, b) => b.window.n - a.window.n);
 }
@@ -53,12 +58,15 @@ function snapshot() {
 function summaryLine(which = 'window') {
   const rows = snapshot().filter((r) => r[which].n > 0);
   if (!rows.length) return null;
-  return rows.map((r) => `${r.event}=${r[which].mean}(n=${r[which].n},max=${r[which].max})`).join(' ');
+  return rows.map((r) => {
+    const w = r[which];
+    return `${r.event}=${w.mean}(n=${w.n},max=${w.max}${w.interrupted ? ',中断=' + w.interrupted : ''})`;
+  }).join(' ');
 }
 
 /* Called after a summary is written: the window restarts, the session total does not. */
 function resetWindow() {
-  for (const s of windows.values()) { s.wN = 0; s.wSum = 0; s.wMin = Infinity; s.wMax = 0; }
+  for (const s of windows.values()) { s.wN = 0; s.wSum = 0; s.wMin = Infinity; s.wMax = 0; s.wInt = 0; }
   dirty = false;
 }
 function isEmpty() { return !windows.size; }
@@ -79,4 +87,4 @@ function startPeriodic(writeLine, intervalSec = 60) {
   return t;
 }
 
-module.exports = { observe, snapshot, summaryLine, resetWindow, startPeriodic, isEmpty, isDirty, clear };
+module.exports = { observe, snapshot, summaryLine, resetWindow, startPeriodic, isEmpty, isDirty, clear, MAX_PLAUSIBLE_MS };

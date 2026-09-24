@@ -56,6 +56,10 @@ const MIME = {
 
 /* ---------------- SSE hot-reload hub ---------------- */
 
+/* --no-reload disables both the watcher and the injected client, so a test run can
+   never have its page reloaded out from under it. */
+const NO_RELOAD = args.includes('--no-reload');
+
 const clients = new Set();
 
 function broadcast(msg) {
@@ -69,6 +73,7 @@ setInterval(() => {
 }, 25000).unref();
 
 function injectReloadClient(html) {
+  if (NO_RELOAD) return html;
   if (!/<\/body>/i.test(html)) return html;
   const snippet = '<script>window.__GALLERY_LOG_LEVEL=' + JSON.stringify(log.getLevel()) + ';' +
     '(function(){try{var es=new EventSource("/__lr");' +
@@ -77,20 +82,26 @@ function injectReloadClient(html) {
   return html.replace(/<\/body>/i, snippet + '</body>');
 }
 
+/* Allow-list, not deny-list: only the files whose edit actually changes the page may
+   trigger a refresh. A deny-list reloaded every open tab on any other write in the
+   gallery root (stray files, .gitignore, logs) — and it broke a test run mid-flight. */
+const RELOAD_SOURCES = /^(index\.html|styles\.css|app\.js|config\.js|data\.js|folders\.json)$/i;
+const RELOAD_DATASET = /^sets[\\/][^\\/]+[\\/]data\.js$/i;
 let reloadTimer = null;
-try {
-  fs.watch(GALLERY, { persistent: true }, (event, file) => {
-    const f = String(file || '');
-    if (!f || /\.(webp|jpe?g|png|gif|json|md|log)$/i.test(f)) return;
-    if (/^(build)(\\|\/|$)/.test(f)) return;
-    clearTimeout(reloadTimer);
-    reloadTimer = setTimeout(() => {
-      broadcast('reload');
-      log.debug('hot-reload', `"${f}" changed → refreshing ${clients.size} client(s)`);
-    }, 200);
-  });
-} catch (e) {
-  log.warn('hot-reload', 'watcher unavailable: ' + e.message);
+if (!NO_RELOAD) {
+  try {
+    fs.watch(GALLERY, { persistent: true }, (event, file) => {
+      const f = String(file || '');
+      if (!RELOAD_SOURCES.test(f) && !RELOAD_DATASET.test(f)) return;
+      clearTimeout(reloadTimer);
+      reloadTimer = setTimeout(() => {
+        broadcast('reload');
+        log.debug('hot-reload', `"${f}" changed → refreshing ${clients.size} client(s)`);
+      }, 200);
+    });
+  } catch (e) {
+    log.warn('hot-reload', 'watcher unavailable: ' + e.message);
+  }
 }
 
 /* ---------------- static file serving ---------------- */
@@ -320,7 +331,7 @@ server.listen(PORT, '127.0.0.1', () => {
   if (DATASET) console.log(`  数据集    ${DATASET}   (data.js → sets\\${DATASET}\\data.js)`);
   console.log(`  图片目录  ${FLICKR}`);
   console.log(`  资产目录  ${ASSETS_ROOT}`);
-  console.log('  热更新    已启用(改 HTML/CSS/JS/data.js 自动刷新页面)');
+  console.log(`  热更新    ${NO_RELOAD ? '已关闭 (--no-reload)' : '已启用(仅 index/styles/app/config/data.js 变化才刷新)'}`);
   console.log(`  日志      ${LOG_FILE || '(仅控制台)'}${log.isDebug() ? '' : '   [--debug 可记录每次路由与解码预热]'}`);
   console.log(`  延迟均值  ${STATS_SEC ? `每 ${STATS_SEC}s 记录一行 [stats];随时查看 http://127.0.0.1:${PORT}/__stats` : '已关闭 (--stats-sec 0)'}`);
   console.log('  停止      关闭本窗口 或 Ctrl+C(或双击 stop-gallery.cmd)');

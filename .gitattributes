@@ -1,0 +1,36 @@
+# ============================================================================
+#  Flickr-Gallery .gitattributes
+#
+#  Line endings: the repository stores LF for every text file; Windows script
+#  files are checked out as CRLF (cmd.exe and PowerShell 5.1 are happiest with
+#  CRLF). This is what silences the "LF will be replaced by CRLF" warnings:
+#  the working tree, the index and the attribute rules now agree.
+#
+#  Binary files are marked explicitly so no line-ending filter can ever touch
+#  them (a WebP that goes through an EOL filter gets its RIFF header broken).
+# ============================================================================
+
+# Default for every text file: normalise on commit, check out as LF
+* text=auto eol=lf
+
+# Windows scripts: check out as CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Images are binary: no EOL conversion, no merge
+*.jpg  binary
+*.jpeg binary
+*.png  binary
+*.webp binary
+*.ico  binary
+*.gif  binary
+
+# Generated files are not worth diffing (use "git diff --text" to force)
+data.js           -diff
+latency-report.md -diff
+
+# Keep generated/derived content out of "git archive"
+/assets/** export-ignore
+/logs/**   export-ignore
+/data.js   export-ignore

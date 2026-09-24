@@ -715,11 +715,16 @@ let page = null, browser = null, errs = [], netFails = [];
         slideActive: document.getElementById('lbSlideBtn').classList.contains('active'),
         progressHidden: document.getElementById('lbProgress').hidden,
         toast: document.getElementById('toast').classList.contains('show') ? document.getElementById('toast').textContent : '',
+        cards: document.querySelectorAll('.card').length,
         stripItems: document.querySelectorAll('.strip-item').length,
         stripLoaded: [...document.querySelectorAll('.strip-item img')].filter(i => i.complete && i.naturalWidth > 0).length,
         layers: [...document.querySelectorAll('#lbZoom img')].map(i => i.id + ':' + (i.naturalWidth || 0)),
       }));
       console.error('  失败时状态:', JSON.stringify(st));
+      if (st.cards === 0 && !st.lightbox && !st.help) {
+        console.error('  提示: 页面回到了未启动状态 —— 通常是测试期间触发了热重载。');
+        console.error('        请改用 node build/server.js --no-open --no-reload 启动服务后重跑(套件本身不需要热重载)。');
+      }
     } catch { /* page may be gone */ }
   }
   console.error('  页面错误:', JSON.stringify(errs.slice(-5)));
