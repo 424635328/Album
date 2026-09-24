@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>风景画廊 · Flickr Landscape Gallery</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230e0f12'/%3E%3Ccircle cx='11' cy='11' r='3.4' fill='%23ffd166'/%3E%3Cpath d='M4 24l7.5-9 5 6 4-4.5L28 24z' fill='%234c8dff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header id="topbar">
+  <div class="bar-row">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)" opacity=".16"/><circle cx="11.5" cy="11" r="3.2" fill="#ffd166"/><path d="M4.5 24l7-8.5 4.6 5.4 3.8-4.2 7.6 7.3z" fill="var(--accent)"/></svg>
+      <div class="brand-text">
+        <h1>风景画廊</h1>
+        <span id="stats" class="stats">加载中…</span>
+      </div>
+    </div>
+    <div class="bar-actions">
+      <button id="randomBtn" class="icon-btn" title="随机看一张 (R)" aria-label="随机看一张">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="17" height="17" rx="3.6"/><circle cx="8.6" cy="8.6" r="1.35" fill="currentColor" stroke="none"/><circle cx="15.4" cy="15.4" r="1.35" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.35" fill="currentColor" stroke="none"/></g></svg>
+      </button>
+      <button id="playBtn" class="icon-btn" title="从第一张开始播放 (P)" aria-label="播放幻灯片">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" fill="currentColor"/></svg>
+      </button>
+      <button id="themeBtn" class="icon-btn" title="切换深色 / 浅色主题" aria-label="切换主题">
+        <svg class="ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="currentColor"/></svg>
+        <svg class="ic-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7"/></g></svg>
+      </button>
+      <button id="statsBtn" class="icon-btn" title="统计面板:事件延迟均值 (Y)" aria-label="统计面板">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16"/><path d="M7.5 20V12M12 20V5.5M16.5 20v-5"/></g></svg>
+      </button>
+      <button id="helpBtn" class="icon-btn" title="快捷键帮助与统计 (?)" aria-label="帮助">?</button>
+    </div>
+  </div>
+  <div class="bar-row controls">
+    <div id="chips" class="chips" role="tablist" aria-label="收藏集筛选"></div>
+    <button id="favChip" class="chip fav-chip" title="只看收藏 (F)" aria-label="只看收藏" hidden>
+      <svg viewBox="0 0 24 24" class="chip-star" aria-hidden="true"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8-5.2-2.75L6.8 19.6l1-5.8-4.2-4.1 5.8-.85z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span id="favChipText">只看收藏</span>
+    </button>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" class="search-ic" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="search" type="search" placeholder="搜索标题 / 文件名…  ( / )" autocomplete="off" spellcheck="false" aria-label="搜索照片">
+      <button id="searchClear" class="search-clear" title="清空搜索" aria-label="清空搜索" hidden>✕</button>
+    </div>
+    <select id="sortSel" class="ctl" aria-label="排序方式">
+      <option value="ts-desc">拍摄时间 新→旧</option>
+      <option value="ts-asc">拍摄时间 旧→新</option>
+      <option value="name-asc">文件名 A→Z</option>
+      <option value="size-desc">文件大小 大→小</option>
+      <option value="mp-desc">像素 高→低</option>
+    </select>
+    <select id="orientSel" class="ctl" aria-label="方向筛选">
+      <option value="all">全部方向</option>
+      <option value="landscape">横向</option>
+      <option value="portrait">纵向</option>
+      <option value="square">方形</option>
+      <option value="pano">全景 (≥2.5:1)</option>
+    </select>
+    <select id="yearSel" class="ctl" aria-label="年份筛选" hidden></select>
+    <select id="camSel" class="ctl" aria-label="相机筛选" hidden></select>
+    <label class="density" title="网格行高">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="density-ic"><path d="M3 5h18M3 9.5h18M3 14h18M3 18.5h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="density" type="range" min="120" max="420" step="10" aria-label="网格密度">
+    </label>
+    <button id="copyListBtn" class="icon-btn" title="复制当前清单的文件路径" aria-label="复制清单">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M5.5 15.5h-1a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></g></svg>
+    </button>
+    <button id="resetBtn" class="icon-btn reset-btn" title="重置全部筛选 (Esc Esc)" aria-label="重置筛选" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 10.5A8 8 0 1 1 12 20a8 8 0 0 1-6.4-3.2"/><path d="M4 5.5v5.2h5.2"/></g></svg>
+    </button>
+  </div>
+</header>
+
+<main id="grid" aria-label="照片网格"></main>
+
+<div id="empty" class="empty" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 10.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+  <p>没有符合条件的风光照</p>
+  <button id="clearFilters" class="btn">清除全部筛选</button>
+</div>
+
+<button id="toTop" class="icon-btn to-top" title="回到顶部" aria-label="回到顶部" hidden>↑</button>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="照片查看器" hidden>
+  <div class="lb-top">
+    <div class="lb-meta">
+      <span id="lbCount" class="lb-count"></span>
+      <span id="lbTitle" class="lb-title" title=""></span>
+    </div>
+    <div class="lb-actions">
+      <button data-act="info" class="icon-btn" title="拍摄信息 (I)" aria-label="拍摄信息"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 10.6V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.15" fill="currentColor"/></svg></button>
+      <button data-act="slide" id="lbSlideBtn" class="icon-btn" title="幻灯片播放 (空格)" aria-label="幻灯片"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z" fill="currentColor"/></svg></button>
+      <button data-act="thumbs" id="lbStripBtn" class="icon-btn" title="缩略图条 (T)" aria-label="缩略图条"><svg viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 14.5l4.5-4 4 3.5 3-2.6 5.5 4.6"/></g></svg></button>
+      <button data-act="fs" id="lbFsBtn" class="icon-btn" title="全屏 (F)" aria-label="全屏"><svg viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></g></svg></button>
+      <button data-act="fav" id="lbFavBtn" class="icon-btn" title="收藏这张 (S)" aria-label="收藏"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.8-5.2-2.75L6.8 19.6l1-5.8-4.2-4.1 5.8-.85z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+      <button data-act="close" class="icon-btn" title="关闭 (Esc)" aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+
+  <div class="lb-body">
+    <div id="lbStage" class="lb-stage" tabindex="-1">
+      <div id="lbZoom" class="lb-zoom">
+        <img id="lbImgA" alt="" decoding="async" draggable="false">
+        <img id="lbImgB" alt="" decoding="async" draggable="false">
+        <img id="lbImgTrans" class="trans" alt="" decoding="async" draggable="false">
+      </div>
+      <div id="lbSpinner" class="lb-spinner" hidden><div></div><div></div></div>
+      <button id="lbPrev" class="lb-nav prev" title="上一张 (←)" aria-label="上一张"><svg viewBox="0 0 24 24"><path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="lbNext" class="lb-nav next" title="下一张 (→)" aria-label="下一张"><svg viewBox="0 0 24 24"><path d="M9.5 5.5L16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div id="lbZoomBadge" class="lb-zoom-badge" title="缩放级别 (0 适应 · 1 原始像素)">适应窗口</div>
+      <div id="lbProgress" class="lb-progress" hidden></div>
+    </div>
+
+    <aside id="lbInfo" class="lb-info" hidden aria-label="照片信息">
+      <div class="lb-info-inner">
+        <h3 id="infoTitle"></h3>
+        <div id="infoBadges" class="info-badges"></div>
+        <dl id="infoList" class="info-list"></dl>
+        <div id="infoLinks" class="info-links"></div>
+      </div>
+    </aside>
+  </div>
+
+  <div id="lbStrip" class="lb-strip" hidden><div id="lbStripInner" class="lb-strip-inner"></div></div>
+</div>
+
+<!-- Help -->
+<div id="helpModal" class="modal" role="dialog" aria-modal="true" aria-label="快捷键帮助" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>键盘与手势</h2>
+      <button id="helpClose" class="icon-btn" title="关闭 (Esc)" aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="help-cols">
+      <div>
+        <h4>浏览（灯箱内）</h4>
+        <table class="help-t">
+          <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>上一张 / 下一张</td></tr>
+          <tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>第一张 / 最后一张</td></tr>
+          <tr><td><kbd>空格</kbd></td><td>幻灯片播放 / 暂停</td></tr>
+          <tr><td><kbd>S</kbd></td><td>收藏当前照片</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>关闭</td></tr>
+        </table>
+        <h4>视图（灯箱内）</h4>
+        <table class="help-t">
+          <tr><td><kbd>I</kbd></td><td>拍摄信息面板</td></tr>
+          <tr><td><kbd>T</kbd></td><td>缩略图条</td></tr>
+          <tr><td><kbd>F</kbd></td><td>全屏</td></tr>
+        </table>
+      </div>
+      <div>
+        <h4>缩放</h4>
+        <table class="help-t">
+          <tr><td><kbd>+</kbd> <kbd>-</kbd></td><td>放大 / 缩小</td></tr>
+          <tr><td><kbd>0</kbd></td><td>适应窗口</td></tr>
+          <tr><td><kbd>1</kbd></td><td>100% 像素</td></tr>
+          <tr><td>滚轮 / 双指</td><td>光标处缩放</td></tr>
+          <tr><td>双击</td><td>适应 ⇄ 100%</td></tr>
+          <tr><td>拖拽</td><td>平移(放大时)</td></tr>
+          <tr><td>滑动</td><td>适应时切换照片</td></tr>
+        </table>
+        <h4>全局（首页）</h4>
+        <table class="help-t">
+          <tr><td><kbd>R</kbd></td><td>随机看一张</td></tr>
+          <tr><td><kbd>P</kbd></td><td>从第一张开始播放</td></tr>
+          <tr><td><kbd>F</kbd></td><td>只看收藏</td></tr>
+          <tr><td><kbd>/</kbd></td><td>聚焦搜索</td></tr>
+          <tr><td><kbd>Y</kbd></td><td>统计面板(事件延迟均值)</td></tr>
+          <tr><td><kbd>?</kbd></td><td>本帮助与统计</td></tr>
+        </table>
+      </div>
+    </div>
+    <div id="helpStats" class="help-stats"></div>
+    <div id="slideMsRow" class="help-stats slide-ms-row">
+      <h4>幻灯片间隔</h4>
+      <div class="ms-btns">
+        <button type="button" data-ms="3000">3 秒</button>
+        <button type="button" data-ms="5000">5 秒</button>
+        <button type="button" data-ms="8000">8 秒</button>
+        <button type="button" data-ms="12000">12 秒</button>
+      </div>
+    </div>
+    <p class="help-note">所有偏好(主题、密度、筛选、排序)自动保存;关闭后重新打开页面继续上次的浏览设置。</p>
+  </div>
+</div>
+
+<!-- Statistics panel: event latency means measured in this page, plus the totals the
+     server has been accumulating from every reported event. -->
+<div id="statsModal" class="modal" role="dialog" aria-modal="true" aria-label="统计面板" hidden>
+  <div class="modal-card stats-card">
+    <div class="modal-head">
+      <h2>统计面板 · 事件延迟</h2>
+      <div class="stats-actions">
+        <button id="statsRefresh" class="ghost-btn" type="button">刷新</button>
+        <button id="statsCopy" class="ghost-btn" type="button">复制 Markdown</button>
+        <button id="statsClose" class="icon-btn" title="关闭 (Esc)" aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+    <div id="statsSummary" class="stat-grid stats-summary"></div>
+    <p id="statsNote" class="help-note"></p>
+    <h4 class="stats-h">本次会话 · 页面内测量(事件 → 下一帧绘制)</h4>
+    <div class="stats-wrap"><table class="stats-t" id="statsTable"><thead>
+      <tr><th>事件</th><th>次数</th><th>均值</th><th>中位</th><th>p95</th><th>最大</th></tr>
+    </thead><tbody></tbody></table></div>
+    <h4 class="stats-h">服务器累计 · 自服务启动(含预取命中 / 冷读拆分)</h4>
+    <div class="stats-wrap"><table class="stats-t" id="statsServerTable"><thead>
+      <tr><th>事件</th><th>次数</th><th>均值</th><th>最小</th><th>最大</th></tr>
+    </thead><tbody></tbody></table></div>
+    <p class="help-note">页面内测量不受脚本/网络往返影响,是最可信的交互指标;服务器累计需要以 <code>start-gallery.cmd</code> 启动服务后才可用(file:// 模式仅显示会话数据)。</p>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

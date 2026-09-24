@@ -1,0 +1,70 @@
+# ============================================================================
+#  Flickr-Gallery · .gitignore
+#  仓库根目录假定为 H:\HDownload\Flickr-Gallery
+#
+#  原则:能由 build.js 重新生成的一律不入库(资产 0.18GB,源码只有几百 KB)。
+#  若把仓库根设在上一层 H:\HDownload(会包含 132GB 原图目录),请改用文件末尾
+#  「父级仓库」那一段。
+# ============================================================================
+
+# ---- 派生资产:缩略图(3688 张 WebP,约 0.18 GB;预览图目录如重建也一并忽略)----
+# 重建:cd build && node build.js
+/assets/
+/sets/*/assets/
+
+# ---- 生成的数据清单:标题、EXIF、GPS、内嵌 LQIP(约 2.2 MB)-------------------
+# 重建:cd build && node build.js
+/data.js
+/sets/*/data.js
+# 若希望仓库自带可离线打开的清单,可强制加入:git add -f data.js
+
+# ---- 运行期日志与自动生成的报告(按天滚动、含诊断截图)-------------------------
+/logs/
+/latency-report.md
+
+# ---- 依赖(sharp / puppeteer-core 装在 build/ 下)----------------------------
+node_modules/
+/build/node_modules/
+
+# ---- 构建/磁盘探针产物 -------------------------------------------------------
+.cache/
+/build/.cache/
+/build/.disktest/
+*.cache.json
+
+# ---- Windows 与编辑器杂项 ---------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+System Volume Information/
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
+# ---- 临时与诊断产物(含磁盘写探针文件、补丁脚本、备份副本)---------------------
+*.tmp
+*.bak
+*.orig
+*writetest*
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ============================================================================
+#  父级仓库(仓库根 = H:\HDownload,包含原图目录时)在此文件所在层级无法生效,
+#  需在上层目录另放一份 .gitignore,内容至少包含:
+#
+#     /Flickr/                       # 132 GB 原图,只读源,永不入库
+#     /_gallery-test/                # 测试用图片
+#     /Flickr-Gallery/assets/
+#     /Flickr-Gallery/data.js
+#     /Flickr-Gallery/logs/
+#     /Flickr-Gallery/sets/*/assets/
+#     /Flickr-Gallery/sets/*/data.js
+#     node_modules/
+#
+#  校验:git status --short 里不应出现任何 .jpg/.webp/data.js/logs
+# ============================================================================

@@ -1,0 +1,24 @@
+{
+  "_help": "在这里增删条目即可。name 是菜单里显示的名字,path 是图片文件夹(支持任意路径)。",
+  "default": "H:\\HDownload\\Flickr",
+  "folders": [
+    {
+      "name": "Flickr 风景集(默认)",
+      "path": "H:\\HDownload\\Flickr",
+      "count": 3688,
+      "lastUsed": "2026-09-23T15:40:33.503Z"
+    },
+    {
+      "name": "_gallery-test",
+      "path": "H:\\HDownload\\_gallery-test",
+      "lastUsed": "2026-09-23T15:12:28.874Z",
+      "count": 5
+    },
+    {
+      "name": "Flickr0922",
+      "path": "H:\\HDownload\\Flickr0922",
+      "lastUsed": "2026-09-23T15:19:20.790Z",
+      "count": 13886
+    }
+  ]
+}

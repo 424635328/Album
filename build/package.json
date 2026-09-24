@@ -1,0 +1,10 @@
+{
+  "name": "flickr-gallery-build",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Asset builder, preview server and QA harness for the Flickr landscape gallery",
+  "dependencies": {
+    "puppeteer-core": "^25.11.0",
+    "sharp": "^0.34.4"
+  }
+}
